@@ -54,6 +54,7 @@ conda env update --file env.yaml
 Steps:
 1. Start Docker Desktop.
 2. Run the script and prompt in the console.
+3. to close the console and stop the container prompt "break"
 
 ### Manual Execution
 1. Pull the required Docker image:
