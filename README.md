@@ -1,33 +1,76 @@
-# LLMClient
-						Prepare Execution
+# Prepare Execution
 
-Dependency Management via Pip (when standard Python is used)
-- make sure pip is registed as environmental-variable
-    - C:\Users\Frederick\AppData\Local\Programs\Python\Python310
-- Option 1: Load all Dependencies with "pip install dep1 dep2 dep3"
-- Option 2: requires pip-tools ("pip install pip-tools")
-    - When dependencies where changed: enter dependency in requirements.in file
-    - compile requirements file: "pip-compile requirements.in"
-    - install via requirements: "pip install -r requirements.txt"
+## Dependency Loading
 
-Dependency Management via Conda (when Python was loaded with Anaconda/When scipt is executed in Anaconda Env)
-- make sure conda is registered as environmental-variable
-    C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3
-    C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\Scripts
-    C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\condabin
-- use conda env update --file env.yaml"
+### Using Pip (Standard Python)
 
+Ensure that `pip` is registered as an environment variable. Typically, its path is:
+```
+C:\Users\Frederick\AppData\Local\Programs\Python\Python310
+```
 
-                        Execute by Script
+#### Option 1: Install Dependencies Directly
+Use the following command to install all required dependencies:
+```
+pip install dep1 dep2 dep3
+```
 
-TIPS: only use conda environments (base environment) to avoid version conflicts (create custom environment if necessary)
-1. start docker desktop
-2. run script and prompt in console
+#### Option 2: Install Dependencies with `pip-tools`
+`pip-tools` allows for better management of dependencies. To use it:
+1. Install `pip-tools`:
+   ```
+   pip install pip-tools
+   ```
+2. When dependencies change:
+   - Add the new dependency to the `requirements.in` file.
+   - Compile the `requirements.txt` file:
+     ```
+     pip-compile requirements.in
+     ```
+3. Install dependencies from the compiled requirements file:
+   ```
+   pip install -r requirements.txt
+   ```
 
+### Using Conda (Anaconda Python)
 
-						Manual Execution
+Ensure that `conda` is registered as an environment variable. Typical paths include:
+```
+C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3
+C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\Scripts
+C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\condabin
+```
 
-1. pull ollama image: docker pull ollama/ollama
-2. start docker container: docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
-3. run (llama2) LLM. docker exec -it ollama ollama run llama2
-	or in the docker shell: ollama run llama2
+To update the environment, use:
+```
+conda env update --file env.yaml
+```
+
+## Execution Guidelines
+
+### Script Execution
+**Tip:** Use conda environments (preferably the base environment) to avoid version conflicts. Create custom environments if necessary.
+
+Steps:
+1. Start Docker Desktop.
+2. Run the script and prompt in the console.
+
+### Manual Execution
+1. Pull the required Docker image:
+   ```
+   docker pull ollama/ollama
+   ```
+2. Start the Docker container:
+   ```
+   docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+   ```
+3. Run the LLM (e.g., Llama 2):
+   - Directly from the host:
+     ```
+     docker exec -it ollama ollama run llama2
+     ```
+   - Or from within the Docker shell:
+     ```
+     ollama run llama2
+     ```
+
