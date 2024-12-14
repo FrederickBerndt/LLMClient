@@ -1,3 +1,4 @@
+import docker.errors
 import requests, docker, sys, csv, json, os
 #https://github.com/ollama/ollama/blob/main/docs/api.md
 
@@ -40,14 +41,14 @@ def remove_existing_container(name):
     try:
         container = client.containers.get(name)
         container.remove(force=True)
-        print("Existing container removed.")
+        print(f"Existing container {name} removed.")
     except docker.errors.NotFound:
-        print("No existing container found.")
+        print(f"No container named {name} found", file=sys.stderr)
 
-def start_docker_container(name):
+def create_and_start_container(name):
     try:
         client = docker.from_env()
-        print("Starting Ollama container...")
+        print("Starting Ollama container")
         container = client.containers.run(
             "ollama/ollama",                        # Docker image name
             name=name,          
@@ -56,6 +57,30 @@ def start_docker_container(name):
             detach=True
         )
         print("Ollama container is running")
+    except docker.errors.DockerException as e:
+        print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
+        sys.exit(1)
+
+def start_container(name):
+    try:
+        client = docker.from_env()
+        print(f"Loading container {name}")
+        client.containers.get(name).start()
+        print(f"Started container {name}")
+    except docker.errors.NotFound:
+        print("No container named {name} found")
+    except docker.errors.DockerException as e:
+        print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
+        sys.exit(1)
+
+def stop_container(name):
+    try:
+        client = docker.from_env()
+        print(f"Attempting to stop {name}")
+        client.containers.get(name).stop()
+        print(f"Stopped container {name}")
+    except docker.errors.NotFound:
+        print(f"No container named {name} found")
     except docker.errors.DockerException as e:
         print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
         sys.exit(1)
@@ -101,15 +126,18 @@ def init_conn():
     pass
 
 if __name__ == "__main__":
-    remove_existing_container("ollama_container")
-    start_docker_container("ollama_container")
+    # update_ollama()
+    create_and_start_container("ollama_container")
     create_model("Mario", "MarioModel.txt")
-    # pull_model("llama2")
+    # start_container("ollama_container")
     Mario = LLMInstance("Mario")
-    while True:
-        try:
-            prompt = input("prompt: ") or "Who are you?" # default if input is empty string
-            resonse = Mario(prompt)
-            print(resonse)
-        except ValueError:
-            print("Invalid prompt format ")
+    try:
+        while True:
+            try:
+                prompt = input("prompt: ") or "Who are you?" # default if input is empty string
+                if prompt == "break": break
+                resonse = Mario(prompt)
+                print(resonse)
+            except ValueError:
+                print("Invalid prompt format")
+    finally: stop_container("ollama_container")
