@@ -16,7 +16,7 @@ pip install dep1 dep2 dep3
 ```
 
 #### Option 2: Install Dependencies with `pip-tools`
-`pip-tools` allows for better management of dependencies. To use it:
+`pip-tools` allows for easier installation of multiple dependencies. To use it:
 1. Install `pip-tools`:
    ```
    pip install pip-tools
