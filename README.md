@@ -10,7 +10,7 @@ C:\Users\ZEDATACCOUNDNAME\AppData\Local\Programs\Python\Python310
 ```
 
 #### Option 1: Install Dependencies Directly
-Use the following command to install all required dependencies:
+Use pip like this to install all required dependencies (insert real dependencies):
 ```
 pip install dep1 dep2 dep3
 ```
