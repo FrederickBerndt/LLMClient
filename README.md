@@ -6,7 +6,7 @@
 
 Ensure that `pip` is registered as an environment variable. Typically, its path is:
 ```
-C:\Users\Frederick\AppData\Local\Programs\Python\Python310
+C:\Users\ZEDATACCOUNDNAME\AppData\Local\Programs\Python\Python310
 ```
 
 #### Option 1: Install Dependencies Directly
@@ -39,6 +39,12 @@ Ensure that `conda` is registered as an environment variable. Typical paths incl
 C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3
 C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\Scripts
 C:\Users\ZEDATACCOUNDNAME\AppData\Local\anaconda3\condabin
+```
+or in case of a system-wide installation (like on the FU-PC):
+```
+C:\ProgramData\Anaconda3
+C:\ProgramData\Anaconda3\Scripts
+C:\ProgramData\Anaconda3\condabin
 ```
 
 To update the environment, use:
