@@ -2,6 +2,7 @@ import docker.errors
 import requests, docker, sys, csv, json, os
 #https://github.com/ollama/ollama/blob/main/docs/api.md
 
+#%% DEFINE LLM CLASS INTERFACE
 PORT = 11434
 class LLMInstance:
     def __init__(self, model_name, api_endpoint=f"http://localhost:{PORT}/api/generate", **kwargs):
@@ -29,7 +30,7 @@ class LLMInstance:
     
     def __call__(self, question, **kwargs):
         return self.generate(question, **kwargs)
-
+#%% SETTING UP CONTAINER
 def update_ollama():
     client = docker.from_env()
     print("Pulling the latest Ollama image...")
@@ -124,6 +125,20 @@ def init_conn():
     # use fabric to ssh onto server
     # check possiblity for physical authentication (e.g. Yubikey)
     pass
+    
+#%% USING THE LLM
+def analyze_review(llm, review_text, categories):
+    prompt = (
+        f"Given the following review: '{review_text}', identify the best match "
+        f"from the following categories: {', '.join(categories)}. "
+        f"If no category matches, return 'n.a.'."
+        f"Reply with only the matching category value or 'n.a.'."
+    )
+    try:
+        return llm(prompt)
+    except requests.exceptions.RequestException as e:
+        print(f"Error querying Ollama: {e}")
+        return "n.a."
 
 if __name__ == "__main__":
     # update_ollama()
@@ -131,6 +146,15 @@ if __name__ == "__main__":
     create_model("Mario", "MarioModel.txt")
     # start_container("ollama_container")
     Mario = LLMInstance("Mario")
+        """ USE CASE: SENTIMENT ANALYSIS
+    data = pandas.DataFrame(pandas.read_csv("data/apps.csv"))
+    categories = ["positive", "neutral", "negative"]
+    data["category"] = data["text"].apply(ArithmeticError
+        lambda entry: analyze_review(llama3, entry, categories)
+    )
+    print(data.head())"""
+
+    """ USE CASE: CHAT WITH MARIO """
     try:
         while True:
             try:
