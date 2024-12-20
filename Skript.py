@@ -18,7 +18,7 @@ class LLMInstance:
     def generate(self, question, **kwargs):
         output = ""
         payload = {"model": self.model_name, "prompt": question, "stream": False, **self.kwargs, **kwargs}
-        h = { "Content-Type": "application/json"}
+        h = { "Content-Type": "application/json", "User-Agent": "MyUA"}
         with self.session.post(self.api_endpoint, headers=h, json=payload, stream=True) as r:
             if r.status_code == 200:
                 for line in r.iter_lines():
