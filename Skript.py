@@ -1,6 +1,7 @@
 import docker.errors
 import requests, docker, sys, csv, json, os
 #https://github.com/ollama/ollama/blob/main/docs/api.md
+# from https://github.com/FrederickBerndt/LLMClient
 
 #%% DEFINE LLM CLASS INTERFACE
 PORT = 11434
