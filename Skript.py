@@ -1,5 +1,7 @@
 import docker.errors
 import requests, docker, sys, csv, json, os
+import ContainerManager
+from ContainerManager import *
 #https://github.com/ollama/ollama/blob/main/docs/api.md
 # from https://github.com/FrederickBerndt/LLMClient
 
@@ -31,61 +33,7 @@ class LLMInstance:
     
     def __call__(self, question, **kwargs):
         return self.generate(question, **kwargs)
-#%% SETTING UP CONTAINER
-def update_ollama():
-    client = docker.from_env()
-    print("Pulling the latest Ollama image...")
-    client.images.pull("ollama/ollama")
-
-def remove_existing_container(name):
-    client = docker.from_env()
-    print(f"Removing any existing {name} container...")
-    try:
-        container = client.containers.get(name)
-        container.remove(force=True)
-        print(f"Existing container {name} removed.")
-    except docker.errors.NotFound:
-        print(f"No container named {name} found", file=sys.stderr)
-
-def create_and_start_container(name):
-    try:
-        client = docker.from_env()
-        print("Starting Ollama container")
-        container = client.containers.run(
-            "ollama/ollama",                        # Docker image name
-            name=name,          
-            ports={f'{PORT}/tcp': PORT},       
-            restart_policy={"Name": "unless-stopped"},
-            detach=True
-        )
-        print("Ollama container is running")
-    except docker.errors.DockerException as e:
-        print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
-        sys.exit(1)
-
-def start_container(name):
-    try:
-        client = docker.from_env()
-        print(f"Loading container {name}")
-        client.containers.get(name).start()
-        print(f"Started container {name}")
-    except docker.errors.NotFound:
-        print("No container named {name} found")
-    except docker.errors.DockerException as e:
-        print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
-        sys.exit(1)
-
-def stop_container(name):
-    try:
-        client = docker.from_env()
-        print(f"Attempting to stop {name}")
-        client.containers.get(name).stop()
-        print(f"Stopped container {name}")
-    except docker.errors.NotFound:
-        print(f"No container named {name} found")
-    except docker.errors.DockerException as e:
-        print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
-        sys.exit(1)
+#%% Configuring Ollama
 
 def pull_model(model_name):
     url = f"http://localhost:{PORT}/api/pull"
@@ -143,11 +91,11 @@ def analyze_review(llm, review_text, categories):
 
 if __name__ == "__main__":
     # update_ollama()
-    create_and_start_container("ollama_container")
+    ContainerManager.create_and_start_container("ollama_container")
     create_model("Mario", "MarioModel.txt")
     # start_container("ollama_container")
     Mario = LLMInstance("Mario")
-        """ USE CASE: SENTIMENT ANALYSIS
+    """ USE CASE: SENTIMENT ANALYSIS
     data = pandas.DataFrame(pandas.read_csv("data/apps.csv"))
     categories = ["positive", "neutral", "negative"]
     data["category"] = data["text"].apply(ArithmeticError
