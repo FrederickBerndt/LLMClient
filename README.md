@@ -1,3 +1,7 @@
+# Prepare Repository
+1. Clone Repository 'https://github.com/FrederickBerndt/LLMClient.git' with e.g. GitGUI to a new Folder.
+2. Create your own Analysis Project and use ContainerManager and Skript as an interface
+
 # Prepare Execution
 
 ## Dependency Loading
@@ -80,4 +84,3 @@ Steps:
      ```
      ollama run llama2
      ```
-
