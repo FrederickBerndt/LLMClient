@@ -1,5 +1,6 @@
 import docker.errors
 import requests, docker, sys, csv, json, os
+import pandas
 import ContainerManager
 from ContainerManager import *
 #https://github.com/ollama/ollama/blob/main/docs/api.md
@@ -80,8 +81,6 @@ def analyze_review(llm, review_text, categories):
     prompt = (
         f"Given the following review: '{review_text}', identify the best match "
         f"from the following categories: {', '.join(categories)}. "
-        f"If no category matches, return 'n.a.'."
-        f"Reply with only the matching category value or 'n.a.'."
     )
     try:
         return llm(prompt)
@@ -91,19 +90,31 @@ def analyze_review(llm, review_text, categories):
 
 if __name__ == "__main__":
     # update_ollama()
-    ContainerManager.create_and_start_container("ollama_container")
-    create_model("Mario", "MarioModel.txt")
-    # start_container("ollama_container")
-    Mario = LLMInstance("Mario")
-    """ USE CASE: SENTIMENT ANALYSIS
-    data = pandas.DataFrame(pandas.read_csv("data/apps.csv"))
+    ContainerManager.start_container("ollama_container")
+    
+    """ USE CASE: SENTIMENT ANALYSIS """
+    create_model("ReviewProcessor", "ReviewModel.txt")
+    ReviewProcessor = LLMInstance("ReviewProcessor")
+    input_file = "data/apps.csv"
+    output_file = 'data/processed_file.csv'
     categories = ["positive", "neutral", "negative"]
-    data["category"] = data["text"].apply(ArithmeticError
-        lambda entry: analyze_review(llama3, entry, categories)
-    )
-    print(data.head())"""
+    chunksize = 10000
+    for i, chunk in enumerate(pandas.read_csv(input_file, chunksize=10000)):  # Use e.g. Dask library for utilizing multi-core environments. Pandas is single core and In-Memory, while Dask allows DataFrames to live on disk.
+        try:
+            chunk["category"] = chunk["text"].apply(lambda entry: analyze_review(ReviewProcessor, entry, categories))
+            if i == 0:
+                chunk.to_csv(output_file, index=False, mode='w')  # Overwrite for first chunk
+            else:
+                chunk.to_csv(output_file, index=False, header=False, mode='a')  # Append without headers
+        except Exception as e:
+            print(f"An error occured at chunk {i} (from row {i*chunksize} to row {((i+1)*chunksize-1)}): {e}")
+        finally: 
+            stop_container("ollama_container")
+            break
 
-    """ USE CASE: CHAT WITH MARIO """
+    """ USE CASE: CHAT WITH MARIO 
+    create_model("Mario", "MarioModel.txt")
+    Mario = LLMInstance("Mario")
     try:
         while True:
             try:
@@ -114,3 +125,4 @@ if __name__ == "__main__":
             except ValueError:
                 print("Invalid prompt format")
     finally: stop_container("ollama_container")
+    """
