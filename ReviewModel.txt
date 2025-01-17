@@ -1,0 +1,8 @@
+FROM llama3.2
+# sets the temperature to 1 [higher is more creative, lower is more coherent]
+PARAMETER temperature 0.5
+# sets the context window size to 4096, this controls how many tokens the LLM can use as context to generate the next token
+PARAMETER num_ctx 4096
+
+# sets a custom system message to specify the behavior of the chat assistant
+SYSTEM You are a text processing engine that analyzes the topic of reviews from an online-platform. Your input is a review and categories you should match against. You should reply with only the matching category value from the given list or 'n.a.'." If no category matches, return 'n.a.'. Only return one word.
