@@ -1,8 +1,8 @@
-import docker.errors
 import requests, docker, sys, csv, json, os
 import pandas
 import ContainerManager
 from ContainerManager import *
+import argparse
 #https://github.com/ollama/ollama/blob/main/docs/api.md
 # from https://github.com/FrederickBerndt/LLMClient
 
@@ -19,7 +19,7 @@ class LLMInstance:
     def generate(self, question, **kwargs):
         output = ""
         payload = {"model": self.model_name, "prompt": question, "stream": False, **self.kwargs, **kwargs}
-        h = { "Content-Type": "application/json"}
+        h = { "Content-Type": "application/json", "User-Agent": "MyUA"}
         with self.session.post(self.api_endpoint, headers=h, json=payload, stream=True) as r:
             if r.status_code == 200:
                 for line in r.iter_lines():
@@ -89,13 +89,18 @@ def analyze_review(llm, review_text, categories):
         return "n.a."
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="LLM Analysis over CLI")
+    parser.add_argument("inPath", default="data/apps.csv", help="relative Filepath of the Input CSV File")
+    parser.add_argument("llmPath", default="ReviewModel.txt", help="relative Filepath of the llm-model description")
+    args = parser.parse_args()
+
     # update_ollama()
-    ContainerManager.start_container("ollama_container")
+    ContainerManager.safe_start_container("ollama_container")
     
     """ USE CASE: SENTIMENT ANALYSIS """
-    create_model("ReviewProcessor", "ReviewModel.txt")
+    create_model("ReviewProcessor", args.llmPath)
     ReviewProcessor = LLMInstance("ReviewProcessor")
-    input_file = "data/apps.csv"
+    input_file = args.inPath
     output_file = 'data/processed_file.csv'
     categories = ["positive", "neutral", "negative"]
     chunksize = 10000
