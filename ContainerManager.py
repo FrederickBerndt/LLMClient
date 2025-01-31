@@ -33,7 +33,7 @@ def create_and_start_container(name):
         print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
         sys.exit(1)
 
-def start_container(name):
+def safe_start_container(name):
     try:
         client = docker.from_env()
         print(f"Loading container {name}")
@@ -41,6 +41,7 @@ def start_container(name):
         print(f"Started container {name}")
     except docker.errors.NotFound:
         print("No container named {name} found")
+        create_and_start_container(name)
     except docker.errors.DockerException as e:
         print(f"An error occurred while interacting with Docker: {e}", file=sys.stderr)
         sys.exit(1)
